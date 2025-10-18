@@ -5,13 +5,13 @@
 ![MySQL](https://img.shields.io/badge/MySQL-8.x-blue)
 
 ## Особенности
- Интуитивный интерфейс - пошаговый процесс бронирования с визуальным календарем
- Real-time проверка доступности - мгновенное отображение свободных слотов
- Защита от двойного бронирования - система блокировок для предотвращения race condition (lockForUpdate() - блокирует таблицу для других запросов)
- Адаптивный дизайн - корректное отображение на всех устройствах
- Гибкая настройка услуг - поддержка услуг любой длительности
- Автоматический расчет времени - учет длительности услуги + 30 минут на подготовку
- Поддержка временных зон - корректная работа с московским временем
+-  Интуитивный интерфейс - пошаговый процесс бронирования с визуальным календарем
+-  Real-time проверка доступности - мгновенное отображение свободных слотов
+-  Защита от двойного бронирования - система блокировок для предотвращения race condition (lockForUpdate() - блокирует таблицу для других запросов)
+-  Адаптивный дизайн - корректное отображение на всех устройствах
+-  Гибкая настройка услуг - поддержка услуг любой длительности
+-  Автоматический расчет времени - учет длительности услуги + 30 минут на подготовку
+-  Поддержка временных зон - корректная работа с московским временем
 
 ## Технологии
 
@@ -80,44 +80,59 @@ npm run dev
 Система бронирования использует реляционную базу данных со следующими таблицами и связями.
 
 # Схема базы данных
-Таблица: services (Услуги)
-Хранит информацию о доступных для бронирования услугах.
+- Таблица: services (Услуги)
+- Хранит информацию о доступных для бронирования услугах.
+```sql
+CREATE TABLE services (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    duration INT NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+```
+Описание полей:
+- id - уникальный идентификатор услуги
+- name - название услуги ("Поездка на квадроцикле")
+- duration - длительность в минутах (30, 60, 120)
+- created_at, updated_at - метки времени
 
-Поле	Тип	Атрибуты	Описание
-id	bigint	PRIMARY KEY, AUTO_INCREMENT	Уникальный идентификатор услуги
-name	varchar(255)	NOT NULL	Название услуги (например, "Поездка на квадроцикле")
-duration	int	NOT NULL	Длительность услуги в минутах (например, 30, 60, 120)
-created_at	timestamp	NULLABLE	Метка времени создания записи
-updated_at	timestamp	NULLABLE	Метка времени последнего обновления
-Пример данных:
+- Таблица бронирований (bookings)
+- Таблица: bookings (Бронирования)
+- Хранит информацию о всех совершённых бронированиях.
+```sql
+CREATE TABLE bookings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    service_id BIGINT NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(20) NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+    INDEX idx_service_time (service_id, start_time)
+);
+```
+Описание полей:
+- id - уникальный идентификатор брони
+- service_id - ссылка на услугу (внешний ключ)
+- customer_name, customer_phone - данные клиента
+- start_time - начало брони (для проверки доступности)
+- end_time - конец брони (start_time + длительность + 30 мин)
+- created_at, updated_at - метки времени
 
-id	name	duration	created_at	updated_at
-1	Поездка на квадроцикле (30 мин)	30	2025-10-01 10:00:00	2025-10-01 11:00:00
-2	Тур на эндуро (120 мин)	120	2025-11-11 10:00:00	2025-11-11 11:00:00
-Таблица: bookings (Бронирования)
-Хранит информацию о всех совершённых бронированиях.
-
-Поле	Тип	Атрибуты	Описание
-id	bigint	PRIMARY KEY, AUTO_INCREMENT	Уникальный идентификатор бронирования
-service_id	bigint	FOREIGN KEY, NOT NULL	Ссылка на идентификатор услуги из таблицы services
-customer_name	varchar(255)	NOT NULL	Имя клиента
-customer_phone	varchar(20)	NOT NULL	Телефон клиента
-start_time	datetime	NOT NULL	Дата и время начала бронирования (ключевое поле для проверки доступности)
-end_time	datetime	NOT NULL	Дата и время окончания бронирования. Рассчитывается как start_time + длительность услуги + 30 минут на подготовку
-created_at	timestamp	NULLABLE	Метка времени создания записи
-updated_at	timestamp	NULLABLE	Метка времени последнего обновления
 
 # Связи между таблицами (Relationships)
-Service (1) → (hasMany) → (N) Booking
-Одна Услуга может иметь много Бронирований.
-Реализовано через метод bookings() в модели Service.php.
-Booking (N) → (belongsTo) → (1) Service
-Каждое Бронирование принадлежит одной Услуге.
-Реализовано через метод service() в модели Booking.php.
-Внешний ключ service_id в таблице bookings обеспечивает целостность данных (ON DELETE CASCADE).
+- Service (1) → (hasMany) → (N) Booking
+- Одна Услуга может иметь много Бронирований.
+- Реализовано через метод bookings() в модели Service.php.
+- Booking (N) → (belongsTo) → (1) Service
+- Каждое Бронирование принадлежит одной Услуге.
+- Реализовано через метод service() в модели Booking.php.
+- Внешний ключ service_id в таблице bookings обеспечивает целостность данных (ON DELETE CASCADE).
 
 ##  Автор
-
 - GitHub: [@yourusername](https://github.com/Fotonchik)
 - Portfolio: [yourportfolio.com](https://hh.ru/resume/4bde0dbeff0b000ce70039ed1f696b666c5642)
 
