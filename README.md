@@ -1,61 +1,131 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Бронирование услуг
+![PHP](https://img.shields.io/badge/PHP-8.1-purple)
+![Laravel](https://img.shields.io/badge/Laravel-10.x-red)
+![Vue](https://img.shields.io/badge/Vue.js-3.x-green)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-blue)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Особенности
+ Интуитивный интерфейс - пошаговый процесс бронирования с визуальным календарем
+ Real-time проверка доступности - мгновенное отображение свободных слотов
+ Защита от двойного бронирования - система блокировок для предотвращения race condition (lockForUpdate() - блокирует таблицу для других запросов)
+ Адаптивный дизайн - корректное отображение на всех устройствах
+ Гибкая настройка услуг - поддержка услуг любой длительности
+ Автоматический расчет времени - учет длительности услуги + 30 минут на подготовку
+ Поддержка временных зон - корректная работа с московским временем
 
-## About Laravel
+## Технологии
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Backend:
+Laravel
+PHP 
+MySQL 
+Carbon для работы с датами
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Frontend:
+Vue.js
+Composition API
+Inertia.js
+Bootstrap 5
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Безопасность:
+CSRF 
+Валидация на стороне сервера
+SQL injection protection
+XSS 
 
-## Learning Laravel
+## Быстрый старт
+Предварительные требования
+PHP 8.1+
+Composer
+MySQL 8.x
+Node.js 16+
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Установка
+Клонирование репозитория
+```bash
+git clone https://github.com/your-username/booking-system.git
+cd booking-system
+```
+Установка зависимостей
+```bash
+composer install
+npm install
+```
+Настройка окружения
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+Настройка базы данных
+```bash
+# В файле .env = настройки БД
+DB_DATABASE=booking_system
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+Запуск миграций и сидеров
+```bash
+php artisan migrate
+php artisan db:seed
+```
+Запуск приложения
+```bash
+php artisan serve
+```
+# Frontend сборка
+npm run dev
+Приложение будет доступно по адресу: http://localhost:8000
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Cтруктура базы данных
+Система бронирования использует реляционную базу данных со следующими таблицами и связями.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Схема базы данных
+Таблица: services (Услуги)
+Хранит информацию о доступных для бронирования услугах.
 
-## Laravel Sponsors
+Поле	Тип	Атрибуты	Описание
+id	bigint	PRIMARY KEY, AUTO_INCREMENT	Уникальный идентификатор услуги
+name	varchar(255)	NOT NULL	Название услуги (например, "Поездка на квадроцикле")
+duration	int	NOT NULL	Длительность услуги в минутах (например, 30, 60, 120)
+created_at	timestamp	NULLABLE	Метка времени создания записи
+updated_at	timestamp	NULLABLE	Метка времени последнего обновления
+Пример данных:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+id	name	duration	created_at	updated_at
+1	Поездка на квадроцикле (30 мин)	30	2025-10-01 10:00:00	2025-10-01 11:00:00
+2	Тур на эндуро (120 мин)	120	2025-11-11 10:00:00	2025-11-11 11:00:00
+Таблица: bookings (Бронирования)
+Хранит информацию о всех совершённых бронированиях.
 
-### Premium Partners
+Поле	Тип	Атрибуты	Описание
+id	bigint	PRIMARY KEY, AUTO_INCREMENT	Уникальный идентификатор бронирования
+service_id	bigint	FOREIGN KEY, NOT NULL	Ссылка на идентификатор услуги из таблицы services
+customer_name	varchar(255)	NOT NULL	Имя клиента
+customer_phone	varchar(20)	NOT NULL	Телефон клиента
+start_time	datetime	NOT NULL	Дата и время начала бронирования (ключевое поле для проверки доступности)
+end_time	datetime	NOT NULL	Дата и время окончания бронирования. Рассчитывается как start_time + длительность услуги + 30 минут на подготовку
+created_at	timestamp	NULLABLE	Метка времени создания записи
+updated_at	timestamp	NULLABLE	Метка времени последнего обновления
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Связи между таблицами (Relationships)
+Service (1) → (hasMany) → (N) Booking
+Одна Услуга может иметь много Бронирований.
+Реализовано через метод bookings() в модели Service.php.
+Booking (N) → (belongsTo) → (1) Service
+Каждое Бронирование принадлежит одной Услуге.
+Реализовано через метод service() в модели Booking.php.
+Внешний ключ service_id в таблице bookings обеспечивает целостность данных (ON DELETE CASCADE).
 
-## Contributing
+##  Автор
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- GitHub: [@yourusername](https://github.com/Fotonchik)
+- Portfolio: [yourportfolio.com](https://hh.ru/resume/4bde0dbeff0b000ce70039ed1f696b666c5642)
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+ # Результат
+<img width="925" height="758" alt="image" src="https://github.com/user-attachments/assets/50294718-30eb-4c56-8747-6b286a060d7b" />
+<img width="873" height="756" alt="image" src="https://github.com/user-attachments/assets/c79e0159-b721-4008-bb89-8fbb25b4bc72" />
+<img width="931" height="862" alt="image" src="https://github.com/user-attachments/assets/c78967c5-b3c0-44ee-9c78-3c0d250cccc9" />
+<img width="866" height="799" alt="image" src="https://github.com/user-attachments/assets/fbf955b3-a224-413d-a268-cb51235d4643" />
+<img width="924" height="812" alt="image" src="https://github.com/user-attachments/assets/5259a513-a6fc-4eb5-bbb9-9f1071bf7d45" />
+<img width="853" height="811" alt="image" src="https://github.com/user-attachments/assets/525227ef-b415-4ff3-b707-720e814dadb9" />
+<img width="939" height="835" alt="image" src="https://github.com/user-attachments/assets/dcd65e11-a55f-4d65-8c40-2b17ad3d230a" />
