@@ -1,0 +1,150 @@
+/* Стили для компонентов бронирования */
+.booking-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.booking-header {
+    background-color: #0d6efd;
+    color: white;
+    padding: 2rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.booking-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.booking-header p {
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.progress-steps-container {
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.step-active {
+    background-color: #198754 !important;
+    color: white !important;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: currentColor;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.step-active .step-number {
+    background-color: white;
+    color: #198754;
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.step-connector {
+    flex: 1;
+    height: 2px;
+    background-color: #dee2e6;
+    margin: 0 10px;
+}
+
+.service-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.service-card.border-success {
+    border-color: #198754 !important;
+}
+
+.day-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.day-card:not(.bg-light):not(.bg-danger):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.time-slot {
+    padding: 12px 8px;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.time-slot:hover {
+    transform: translateY(-1px);
+}
+
+.booking-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 12px;
+}
+
+.booking-card .card-header {
+    background-color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.booking-card .card-body {
+    padding: 1.5rem;
+}
+
+.booking-modal {
+    background-color: rgba(0,0,0,0.5);
+}
+
+.booking-modal .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.week-navigation {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.booking-alert {
+    border: none;
+    border-radius: 8px;
+}
